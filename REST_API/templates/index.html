@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stock Market</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+  <h1>Stock Market</h1>
+
+  <div id="stocks">
+    <h2>Stocks</h2>
+    <ul>
+      {% for stock in stocks %}
+      <li>{{ stock.name }} ({{ stock.ticker }}): ${{ stock.price }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <div id="add-stock">
+    <h2>Add a New Stock</h2>
+    <form id="stock-form">
+      <label for="name">Name:</label>
+      <input type="text" id="name" name="name" required /><br />
+      <label for="ticker">Ticker:</label>
+      <input type="text" id="ticker" name="ticker" required /><br />
+      <label for="price">Price:</label>
+      <input type="number" id="price" name="price" step="0.01" required /><br />
+      <button type="submit">Add Stock</button>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById("stock-form").addEventListener("submit", function (event) {
+      event.preventDefault();
+      const name = document.getElementById("name").value;
+      const ticker = document.getElementById("ticker").value;
+      const price = parseFloat(document.getElementById("price").value);
+
+      fetch("/stocks", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name, ticker, price }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.message) {
+            alert(data.message);
+            location.reload();
+          } else {
+            alert("Error: " + data.error);
+          }
+        });
+    });
+  </script>
+</body>
+</html>
